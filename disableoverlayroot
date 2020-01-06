@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Restart script with sudo
+if [ `id -u` -gt 0 ]; then
+    exec sudo "$0" "$@"
+fi
+# Locate actual destination of script (if symlinked)
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where th$
+done
+dir="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+cd $dir
+
+# Ensure overlayroot is enabled, and we are in rootwork
+HAS_OVERLAY=$(df / | grep overlay)
+if [ ! "$HAS_OVERLAY" ] && [ -f /etc/initramfs-tools/hooks/hooks-overlay ]; then
+	set -e
+	rm /etc/initramfs-tools/hooks/hooks-overlay
+	rm /etc/initramfs-tools/scripts/init-bottom/init-bottom-overlay
+        update-initramfs -k $(uname -r) -u
+        echo -e "Disable successfully. Reboot for changes to take effect."
+elif [ -z "${IMCHROOTED}" ]; then
+	echo -e "Cannot disable without first running \e[31mrootwork\e[0m."
+else
+	echo -e "Already disabled"
+fi

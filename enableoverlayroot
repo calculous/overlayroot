@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Restart script with sudo
+if [ `id -u` -gt 0 ]; then
+    exec sudo "$0" "$@"
+fi
+
+# Locate actual destination of script (if symlinked)
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+dir="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+cd $dir
+
+# Ensure overlayroot is disabled
+HAS_OVERLAY=$(df / | grep overlay)
+if [ ! "$HAS_OVERLAY" ] && [ ! -f /etc/initramfs-tools/hooks/hooks-overlay ]; then
+        # Load overlay module, if ok, add to loaded modules
+	set -e
+	modprobe overlay
+	if [ ! $(cat /etc/initramfs-tools/modules | grep overlay) ]; then
+		echo "overlay" >>  /etc/initramfs-tools/modules
+	fi
+	apt-get install busybox-static
+	cp hooks-overlay /etc/initramfs-tools/hooks/
+	cp init-bottom-overlay /etc/initramfs-tools/scripts/init-bottom/
+        update-initramfs -k $(uname -r) -u
+	ln -sf $dir/rootwork /sbin/rootwork
+	ln -sf $dir/enableoverlayroot /sbin/enableoverlayroot
+	ln -sf $dir/disableoverlayroot /sbin/disableoverlayroot
+        echo "Enabled successfully. Reboot for changes to take effect."
+else
+	echo "Already enabled"
+fi
