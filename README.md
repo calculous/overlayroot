@@ -87,12 +87,12 @@ Now continue to [all distributions](#all-distributions) to finish the installati
 add contents of ./.bashrc to ~/.bashrc
 
 ```bash
-echo .bashrc >> ~/.bashrc
+cat .bashrc >> ~/.bashrc
 ```
 
 After rebooting, the root filesystem should be an overlay. If it's on tmpfs any changes 
 made will be lost after a reboot. If you want to upgrade packages, for example,
-run `rootwork`, the prompt should append a warning sign indicating / is unprotected.
+run `rootwork`, the prompt should prepend a warning sign indicating / is unprotected.
 ```bash
 [⚠️ ] :#
 ```
