@@ -8,6 +8,19 @@ read-write copy on write overlay.
 
 There are two sets of instructions below: [Raspbian](#raspbian) and [Ubuntu for ARM](#ubuntu-for-arm).
 
+## Convinience Script for Armbian
+
+Use enableoverlayroot script to automatically setup they same way as under Ubuntu for ARM.
+This script has been tested on armbian.
+```bash
+./enableoverlayroot
+```
+
+Consider also adding `40-ram-filesystem` to `/etc/default/armbian-motd` so that the user is prompted that overlayroot is used when they login
+```bash
+cp 40-ram-filesystem /etc/update-motd.d/
+```
+
 ## Raspbian
 
 It uses initramfs. Stock Raspbian doesn't use one so step one would be to get initramfs working. 
@@ -71,12 +84,10 @@ Now continue to [all distributions](#all-distributions) to finish the installati
 
 ## all distributions
 
-add to .bashrc
+add contents of ./.bashrc to ~/.bashrc
 
 ```bash
-if [ ! -z "${IMCHROOTED}" ]; then
-        PS1="chroot(${IMCHROOTED})\w:# "
-fi
+echo .bashrc >> ~/.bashrc
 ```
 
 After rebooting, the root filesystem should be an overlay. If it's on tmpfs any changes 
