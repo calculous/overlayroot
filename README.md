@@ -92,9 +92,9 @@ echo .bashrc >> ~/.bashrc
 
 After rebooting, the root filesystem should be an overlay. If it's on tmpfs any changes 
 made will be lost after a reboot. If you want to upgrade packages, for example,
-run `rootwork`, the prompt should change to
+run `rootwork`, the prompt should append a warning sign indicating / is unprotected.
 ```bash
-chroot(/overlay/lower)/:#
+[⚠️ ] :#
 ```
 
 You're now making changes to the sdcard, and changes will be permanent.
