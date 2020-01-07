@@ -31,6 +31,7 @@ if [ ! "$HAS_OVERLAY" ] && [ ! -f /etc/initramfs-tools/hooks/hooks-overlay ]; th
 	ln -sf $dir/rootwork /sbin/rootwork
 	ln -sf $dir/enableoverlayroot /sbin/enableoverlayroot
 	ln -sf $dir/disableoverlayroot /sbin/disableoverlayroot
+	ln -sf $dir/storeglusterconfig /sbin/storeglusterconfig
         echo "Enabled successfully. Reboot for changes to take effect."
 else
 	echo "Already enabled"

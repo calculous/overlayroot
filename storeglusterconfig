@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Restart script with sudo
+if [ `id -u` -gt 0 ]; then
+    exec sudo "$0" "$@"
+fi
+
+set -e
+
+
+# Needs to start from root, and no slash on end
+SRC_PATH=/var/lib/glusterd
+TMP_PATH=/tmp/glusterd
+
+echo "Stopping gluster..."
+systemctl stop glusterd
+
+echo "Storing gluster config..."
+
+rm -rf "${TMP_PATH}"
+cp -a "${SRC_PATH}" "${TMP_PATH}"
+mount -o remount,rw "/overlay/lower"
+rm -rf "/overlay/lower${SRC_PATH}.bak"
+cp -a "/overlay/lower${SRC_PATH}" "/overlay/lower${SRC_PATH}.bak"
+rm -rf "/overlay/lower${SRC_PATH}/*"
+cp -a "${TMP_PATH}/." "/overlay/lower/${SRC_PATH}/"
+mount -o remount,ro "/overlay/lower" || {
+    echo "Failed to remount $ROOT read-only, possibly because of an open file."
+    echo "The best thing to do would be to reboot now"
+}
+rm -rf "${TMP_PATH}"
+
+echo "Starting gluster..."
+systemctl start glusterd
+
+echo "Done"
+exit 0
