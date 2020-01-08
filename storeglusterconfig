@@ -22,7 +22,7 @@ cp -a "${SRC_PATH}" "${TMP_PATH}"
 mount -o remount,rw "/overlay/lower"
 rm -rf "/overlay/lower${SRC_PATH}.bak"
 cp -a "/overlay/lower${SRC_PATH}" "/overlay/lower${SRC_PATH}.bak"
-rm -rf "/overlay/lower${SRC_PATH}/*"
+rm -rf "/overlay/lower${SRC_PATH}/"
 cp -a "${TMP_PATH}/." "/overlay/lower/${SRC_PATH}/"
 mount -o remount,ro "/overlay/lower" || {
     echo "Failed to remount $ROOT read-only, possibly because of an open file."
