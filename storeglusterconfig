@@ -5,15 +5,21 @@ if [ `id -u` -gt 0 ]; then
     exec sudo "$0" "$@"
 fi
 
-set -e
-
 
 # Needs to start from root, and no slash on end
 SRC_PATH=/var/lib/glusterd
 TMP_PATH=/tmp/glusterd
+SERVICE=glusterd
+
+# glusterd.service was called glusterfs-server on older debian releases
+if ! systemctl list-units --full -all | grep -Fq "$SERVICE"; then
+	SERVICE=glusterfs-server
+fi
+
+set -e
 
 echo "Stopping gluster..."
-systemctl stop glusterd
+systemctl stop $SERVICE
 
 echo "Storing gluster config..."
 
@@ -31,7 +37,7 @@ mount -o remount,ro "/overlay/lower" || {
 rm -rf "${TMP_PATH}"
 
 echo "Starting gluster..."
-systemctl start glusterd
+systemctl start $SERVICE
 
 echo "Done"
 exit 0
