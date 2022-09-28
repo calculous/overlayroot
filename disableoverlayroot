@@ -27,7 +27,11 @@ if [ ! "$HAS_OVERLAY" ] && [ -f /etc/initramfs-tools/hooks/hooks-overlay ]; then
         fi
 	rm /etc/initramfs-tools/hooks/hooks-overlay
 	rm /etc/initramfs-tools/scripts/init-bottom/init-bottom-overlay
-        update-initramfs -k $(uname -r) -u
+	if [ "$IS_RASPBERRY_PI" ]; then
+		sudo mkinitramfs -o /boot/init.gz
+	else
+		update-initramfs -k $(uname -r) -u
+	fi
         echo -e "Disable successfully. Reboot for changes to take effect."
 elif [ -z "${IMCHROOTED}" ]; then
 	echo -e "Cannot disable without first running \e[31mrootwork\e[0m."
