@@ -22,8 +22,8 @@ if [ ! "$HAS_OVERLAY" ] && [ ! -f /etc/initramfs-tools/hooks/hooks-overlay ]; th
 	set -e
 	set -x
 	# Special case for Raspberry pi
-	IS_RASPBERRY_PI=$(cat /proc/cpuinfo | grep "Raspberry" | cat)
-	if [ "$IS_RASPBERRY_PI" ]; then
+	IS_RASPBIAN=$(cat /etc/*-release | grep Raspbian | cat)
+	if [ "$IS_RASPBIAN" ]; then
 		if [ ! -f /boot/init.gz ]; then
 			mkinitramfs -o /boot/init.gz
 		fi
@@ -39,7 +39,7 @@ if [ ! "$HAS_OVERLAY" ] && [ ! -f /etc/initramfs-tools/hooks/hooks-overlay ]; th
 	apt-get install busybox-static
 	cp hooks-overlay /etc/initramfs-tools/hooks/
 	cp init-bottom-overlay /etc/initramfs-tools/scripts/init-bottom/
-	if [ "$IS_RASPBERRY_PI" ]; then
+	if [ "$IS_RASPBIAN" ]; then
 		sudo mkinitramfs -o /boot/init.gz
 	else
 		update-initramfs -k $(uname -r) -u
