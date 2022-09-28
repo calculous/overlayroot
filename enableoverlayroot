@@ -20,8 +20,20 @@ HAS_OVERLAY=$(df / | grep overlay)
 if [ ! "$HAS_OVERLAY" ] && [ ! -f /etc/initramfs-tools/hooks/hooks-overlay ]; then
         # Load overlay module, if ok, add to loaded modules
 	set -e
+	set -x
+	# Special case for Raspberry pi
+	IS_RASPBERRY_PI=$(cat /proc/cpuinfo | grep "Raspberry" | cat)
+	if [ "$IS_RASPBERRY_PI" ]; then
+		if [ ! -f /boot/init.gz ]; then
+			mkinitramfs -o /boot/init.gz
+		fi
+		INITRAMFS_ENABLED=$(cat /boot/config.txt | grep "initramfs init.gz" | cat)
+		if [ ! "$INITRAMFS_ENABLED" ]; then
+			echo "initramfs init.gz" >> /boot/config.txt
+		fi
+	fi
 	modprobe overlay
-	if [ ! $(cat /etc/initramfs-tools/modules | grep overlay) ]; then
+	if [ ! $(cat /etc/initramfs-tools/modules | grep overlay | cat) ]; then
 		echo "overlay" >>  /etc/initramfs-tools/modules
 	fi
 	apt-get install busybox-static
@@ -31,7 +43,6 @@ if [ ! "$HAS_OVERLAY" ] && [ ! -f /etc/initramfs-tools/hooks/hooks-overlay ]; th
 	ln -sf $dir/rootwork /sbin/rootwork
 	ln -sf $dir/enableoverlayroot /sbin/enableoverlayroot
 	ln -sf $dir/disableoverlayroot /sbin/disableoverlayroot
-	ln -sf $dir/storeglusterconfig /sbin/storeglusterconfig
         echo "Enabled successfully. Reboot for changes to take effect."
 else
 	echo "Already enabled"

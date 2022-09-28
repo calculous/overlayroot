@@ -18,6 +18,13 @@ cd $dir
 HAS_OVERLAY=$(df / | grep overlay)
 if [ ! "$HAS_OVERLAY" ] && [ -f /etc/initramfs-tools/hooks/hooks-overlay ]; then
 	set -e
+	set -x
+
+	# If Raspberry pi, must remove initramfs from boot/config.txt
+	IS_RASPBERRY_PI=$(cat /proc/cpuinfo | grep "Raspberry" | cat)
+        if [ "$IS_RASPBERRY_PI" ]; then
+		sed -i 's/^initramfs init.gz$//' /boot/config.txt
+        fi
 	rm /etc/initramfs-tools/hooks/hooks-overlay
 	rm /etc/initramfs-tools/scripts/init-bottom/init-bottom-overlay
         update-initramfs -k $(uname -r) -u
