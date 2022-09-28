@@ -39,7 +39,11 @@ if [ ! "$HAS_OVERLAY" ] && [ ! -f /etc/initramfs-tools/hooks/hooks-overlay ]; th
 	apt-get install busybox-static
 	cp hooks-overlay /etc/initramfs-tools/hooks/
 	cp init-bottom-overlay /etc/initramfs-tools/scripts/init-bottom/
-        update-initramfs -k $(uname -r) -u
+	if [ "$IS_RASPBERRY_PI" ]; then
+		sudo mkinitramfs -o /boot/init.gz
+	else
+		update-initramfs -k $(uname -r) -u
+	fi
 	ln -sf $dir/rootwork /sbin/rootwork
 	ln -sf $dir/enableoverlayroot /sbin/enableoverlayroot
 	ln -sf $dir/disableoverlayroot /sbin/disableoverlayroot
