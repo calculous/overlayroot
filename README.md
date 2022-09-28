@@ -43,9 +43,6 @@ indicating / is unprotected.
 
 You're now making changes to the sdcard, and changes will be permanent.
 
-I use `rootwork` to work on the real root filesystem.
-I put it in ~/bin and add ~/bin to my path.
-
 The /run directory is problematic to umount, so atm `rootwork` --rbind mounts it
 on the sd-card root file system, /overlay/lower, and it isn't umounted like /boot 
 /proc /sys and /dev are.
