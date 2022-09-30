@@ -1,14 +1,20 @@
 # overlayroot
 
-mounts an overlay filesystem over the root filesystem
+Mounts an overlay filesystem over the root filesystem
 
-I use this for my Raspberry Pi, but it should work on any Debian or derivative.
+Setup should work for Debian, Raspbian, Armbian and Ubuntu (x86/arm) releases.
+### Tested on:
+- x86:
+  - `Ubuntu`
+- armhf:
+  - `Armbian`
+  - `Raspbian`
 
-The root file system on the sd-card is mounted read-only on /overlay/lower, and / is a
+The root file system on the sd-card is mounted read-only on `/overlay/lower`, and `/` is a
 read-write copy on write overlay.
 
 ## How to install:
-Setup should work for Raspbian, Armbian and Ubuntu (x86/arm) releases.
+Setup should work for Debian, Raspbian, Armbian and Ubuntu (x86/arm) releases.
 ```bash
 git clone https://github.com/Gronis/overlayroot.git
 cd overlayroot
@@ -23,7 +29,7 @@ If not, check further down how to do the steps manually.
 ## How to use:
 
 After rebooting, the root filesystem should be an overlay. This is indicated with
-in the message of the day when loggin in:
+in the "message of the day" when loggin in:
 ```
 NOTE:
   This system is running overlayroot to protect the sd card.
@@ -34,21 +40,23 @@ NOTE:
   reboot. Remember to enable again with enableoverlayroot.
 ```
 
-If it's on tmpfs any changes made will be lost after a reboot. If you want to upgrade
-packages, for example, run `rootwork`, the prompt should prepend a warning sign
-indicating / is unprotected.
-```bash
-[⚠️ ] :#
-```
+Any changes made to `/` in this state will be lost after a reboot. If you want to make
+any permanent change to the filesystem. For example, update packages, run `rootwork`.
+This enters a state where writes are stored on storage as usual.
 
-You're now making changes to the sdcard, and changes will be permanent.
+When you do this; The prompt should prepend a warning sign (:warning:) indicating
+that the root file-system is unprotected.
 
-The /run directory is problematic to umount, so atm `rootwork` --rbind mounts it
-on the sd-card root file system, /overlay/lower, and it isn't umounted like /boot 
-/proc /sys and /dev are.
+> ***
+> ⚠️ root@host:/ > _
+> ***
+
+The `/run` directory is problematic to umount, so a.t.m `rootwork` --rbind mounts it
+on the root file system, `/overlay/lower`, and it isn't umounted like `/boot` 
+`/proc` `/sys` and `/dev` are.
 
 After you've finished working on the sd-card run `exit`. `rootwork` tries to clean up 
-by umounting all the mounts it mounted and remount /overlay/lower read-only, but 
+by umounting all the mounts it mounted and remount `/overlay/lower` read-only, but 
 often it can't due to an open file or something else causing the filesystem to be busy.
 It's probably a good idea to reboot now for 2 reasons:
  
@@ -63,6 +71,9 @@ WARNING:
   This system's sd card is not protected. Run enableoverlayroot
   to enable protection after next reboot.
 ```
+
+The command prompt shows a warning sign (:warning:) to indicate this
+just as before.
 
 ## Manual install: Raspbian
 
